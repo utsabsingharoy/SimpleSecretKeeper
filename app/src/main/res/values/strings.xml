@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Secrets</string>
+    <string name="action_settings">Clear</string>
+    <string name="appbar_scrolling_view_behavior">Secrets</string>
+    <string name="encrypt_label">Encrypt</string>
+    <string name="decrypt_label">Decrypt</string>
+    <string name="password_hint">password</string>
+</resources>
