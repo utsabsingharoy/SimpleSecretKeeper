@@ -54,4 +54,8 @@
  3. After any modification in the encrypted file, it must be shared/uploaded to cloud again as during each encryption the initialization vector value changes.
  4. The app does not store the decrypted file anywhere. Only prints it in the terminal.
 
+ ## **Acknowledgement**
+ -  This project uses [cryptopp](https://github.com/weidai11/cryptopp) 
+ -  Icon of the Android app is sourced from [freeicons.io](https://freeicons.io/)
+
  
