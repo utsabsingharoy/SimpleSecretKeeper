@@ -2,8 +2,8 @@
     <string name="app_name">Secrets</string>
     <string name="action_settings">Clear</string>
     <string name="appbar_scrolling_view_behavior">Secrets</string>
-    <string name="encrypt_label">Encrypt</string>
-    <string name="decrypt_label">Decrypt</string>
+    <string name="encrypt_label">New</string>
+    <string name="decrypt_label">View</string>
     <string name="password_hint">password</string>
     <string name="ok_label">OK</string>
     <string name="enter_password">Enter Your Password</string>"

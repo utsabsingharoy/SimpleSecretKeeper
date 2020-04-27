@@ -13,7 +13,7 @@ std::string JstrToCppstr(JNIEnv* env, jstring str) {
     return cpp_str;
 }
 extern "C" JNIEXPORT jbyteArray JNICALL
-Java_com_example_simplepasswordkeeper_MainActivity_encryptString(
+Java_com_example_simplepasswordkeeper_NativeBridge_encryptString(
         JNIEnv* env,
         jobject,
         jstring password,
@@ -28,7 +28,7 @@ Java_com_example_simplepasswordkeeper_MainActivity_encryptString(
 }
 
 extern "C" JNIEXPORT jstring JNICALL
-Java_com_example_simplepasswordkeeper_MainActivity_decryptValue(
+Java_com_example_simplepasswordkeeper_NativeBridge_decryptValue(
         JNIEnv* env,
         jobject /* this */,
         jstring password,
