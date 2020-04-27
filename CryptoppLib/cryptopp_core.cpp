@@ -9,6 +9,7 @@
 #include "cryptopp_inc/hex.h"
 
 namespace cryptopp_core {
+
     std::vector<CryptoPP::byte> PasswordHashSHA256(const std::string& password) {
         std::vector<CryptoPP::byte> password_hash;
         password_hash.resize(CryptoPP::Camellia::MAX_KEYLENGTH);
@@ -43,7 +44,7 @@ namespace cryptopp_core {
 
         }
         catch(const CryptoPP::Exception& e) {
-            result = "Encryption Failed " + e.GetWhat();
+            result = ENCRYPTION_FAILED + e.GetWhat();
             return result;
         }
 
@@ -90,7 +91,7 @@ namespace cryptopp_core {
 
         }
         catch(const CryptoPP::Exception& e) {
-            recovered =  "Decryption Failed " + e.GetWhat();
+            recovered =  DECRYPTION_FAILED + e.GetWhat();
             return recovered;
         }
         return recovered;

@@ -9,7 +9,8 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import kotlinx.android.synthetic.main.activity_main.*
-import android.widget.Toast
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import java.io.IOException
 import java.lang.Exception
 
@@ -17,34 +18,56 @@ import java.lang.Exception
 class MainActivity : AppCompatActivity() {
 
     private var encrypted_result = byteArrayOf()
-    private var password = ""
+    //private var password = ""
+    private lateinit var model : DataViewModel
+    private lateinit var fileuri : Uri
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        encrypt_button.setOnClickListener {
+        model = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(DataViewModel::class.java)
+        var passwordObserver = Observer<String> {
+
+            supportFragmentManager.findFragmentByTag("PasswordFragment")?.let {
+                supportFragmentManager.beginTransaction().remove(it).commit()
+            }
+
+            try {
+                contentResolver.openInputStream(model.filepath.value!!)?.buffered()?.readBytes()?.let {
+                    val text = decryptValue(model.password.value!!, it)
+                    display_text.setText(text)
+                    Log.e("TAG", text)
+                }
+            } catch (e : Exception) {
+                e.printStackTrace()
+            }
+        }
+
+        model.password.observe(this,passwordObserver)
+
+        model.filepath.observe(this, Observer {
+            Log.e("TAG" , "showing fragment")
+            PasswordFragment().show(supportFragmentManager.beginTransaction(), "PasswordFragment")
+        })
+
+        decrypt_button.setOnClickListener {
+            sendFileActionIntent(Intent.ACTION_OPEN_DOCUMENT, DECRYPT_RESULT)
+        }
+
+        /*encrypt_button.setOnClickListener {
             if(!password_field.text.isBlank() && !display_text.text.isBlank()) {
                 encrypted_result = encryptString(password_field.text.toString(), display_text.text.toString())
                 sendFileActionIntent(Intent.ACTION_CREATE_DOCUMENT, SAVE_ENCRYPTED_RESULT)
             }
             else
                 Toast.makeText(this, "Enter password", Toast.LENGTH_SHORT).show()
-        }
-
-        decrypt_button.setOnClickListener {
-            if(!password_field.text.isBlank()) {
-                password = password_field.text.toString();
-                sendFileActionIntent(Intent.ACTION_OPEN_DOCUMENT, DECRYPT_RESULT)
-            }
-            else
-                Toast.makeText(this, "Enter password", Toast.LENGTH_SHORT).show()
-        }
+        }*/
     }
 
     override fun onPause() {
         super.onPause()
-        password_field.text.clear()
+        //password_field.text.clear()
         display_text.text.clear()
     }
 
@@ -72,7 +95,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun decryptResult(uri : Uri) {
+    /*private fun decryptResult(uri : Uri) {
         try {
             contentResolver.openInputStream(uri)?.buffered()?.readBytes()?.let {
                 //Log.e("CPPTAG", "got total bytes" + it.size)
@@ -83,7 +106,11 @@ class MainActivity : AppCompatActivity() {
         } catch (e : Exception) {
             e.printStackTrace()
         }
-    }
+    }*/
+
+    /*private fun decryptResult(uri : Uri) {
+
+    }*/
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intent: Intent?) {
         super.onActivityResult(requestCode, resultCode, intent)
@@ -91,7 +118,7 @@ class MainActivity : AppCompatActivity() {
             intent?.data?.let { uri ->
                 when (requestCode) {
                     SAVE_ENCRYPTED_RESULT -> saveEncryptionResult(uri)
-                    DECRYPT_RESULT -> decryptResult(uri)
+                    DECRYPT_RESULT -> { model.filepath.postValue(uri) }//decryptResult(uri)
                     else -> {}
                 }
             }
