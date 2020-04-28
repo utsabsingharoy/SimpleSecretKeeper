@@ -4,12 +4,12 @@ package com.example.simplepasswordkeeper
 
 import android.app.Activity
 import android.content.Intent
-import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import kotlinx.android.synthetic.main.activity_main.*
 
 
 class MainActivity : AppCompatActivity() {
@@ -20,24 +20,30 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContentView(R.layout.activity_main)
+        setSupportActionBar(materialToolbar)
 
-        model = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(application)).get(DataViewModel::class.java)
+        ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(application))
+            .get(DataViewModel::class.java).let {
+                model = it
+                it.password.observe(this, Observer {
+                    supportFragmentManager.findFragmentByTag("PasswordFragment")?.let {
+                        supportFragmentManager.beginTransaction().remove(it).commit()
+                    }
+                })
 
-        model.password.observe(this, Observer {
-            supportFragmentManager.findFragmentByTag("PasswordFragment")?.let {
-                supportFragmentManager.beginTransaction().remove(it).commit()
+                it.filepath.observe(this, Observer {
+                    PasswordFragment().show(
+                        supportFragmentManager.beginTransaction(),
+                        "PasswordFragment"
+                    )
+                })
+
+                it.decryptedResult.observe(this, Observer {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.main_fragment_container, ViewFragment())
+                        .addToBackStack(null).commit()
+                })
             }
-        })
-
-        model.filepath.observe(this, Observer {
-            PasswordFragment().show(supportFragmentManager.beginTransaction(), "PasswordFragment")
-        })
-
-        model.decryptedResult.observe(this, Observer {
-            supportFragmentManager.beginTransaction()
-                .add(R.id.main_fragment_container, ViewFragment())
-                .addToBackStack(null).commit()
-        })
     }
 
     fun sendFileActionIntent(action : String, requestCode: Int) {

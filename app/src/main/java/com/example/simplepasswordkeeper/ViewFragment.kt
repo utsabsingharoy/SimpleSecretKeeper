@@ -27,7 +27,7 @@ class ViewFragment : Fragment() {
         )
 
         floating_save_button.setOnClickListener {
-            model.modifiedData.postValue(display_text.text.toString())
+            //model.modifiedData.postValue(display_text.text.toString())
         }
     }
 }
