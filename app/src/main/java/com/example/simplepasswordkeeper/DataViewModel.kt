@@ -6,8 +6,6 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
-import org.json.JSONArray
-import org.json.JSONObject
 import java.io.IOException
 
 class DataViewModel(application: Application) : AndroidViewModel(application) {
@@ -15,61 +13,28 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     var filepath = MutableLiveData<Uri>()
     var decryptedResult = MutableLiveData<String>()
     var modifiedData = MutableLiveData<String>()
-    var decryptedData = mutableListOf(mutableMapOf<String, String>())
+    lateinit var decryptedData : DecryptedData
 
     private fun passwordObserver() {
         try {
             getApplication<Application>().contentResolver
                 .openInputStream(filepath.value!!)?.buffered()?.readBytes()?.let {
-                    val rawJson = NativeBridge().decryptValue(password.value!!, it)
-                    processJson(rawJson)
+                    val rawJson = NativeBridge().decryptValue(password.value!!, it).trim()
+                    decryptedData = DecryptedData(rawJson)
                     decryptedResult.postValue(rawJson)
-                    //Log.e("TAG", decryptedResult.value!!)
             }
         } catch (e : Exception) {
             e.printStackTrace()
         }
     }
 
-
-
-    private class JsonArrayIterable(val jsonArray: JSONArray) : Iterable<JSONObject> {
-        override fun iterator(): Iterator<JSONObject> {
-            return JsonArrayIterator(jsonArray)
-        }
-
-        private class JsonArrayIterator(val jsonArray: JSONArray) : Iterator<JSONObject> {
-            private  var i = 0
-            override fun hasNext() : Boolean{
-                return i < jsonArray.length()
-            }
-            override fun next() : JSONObject {
-                val obj = jsonArray.getJSONObject(i);
-                i++
-                return obj
-            }
-        }
-    }
-
-    private fun processJson(rawJson : String) : String {
-        rawJson.let { JSONArray(rawJson) }.let { jsonArray ->
-            JsonArrayIterable(jsonArray).map {
-                var obj = mutableMapOf<String, String>()
-                for (name in it.keys())
-                    obj.put(name, it.getString(name))
-                obj
-            }.toMutableList()
-        }.also {
-            decryptedData = it
-        }.forEach {
-            Log.e("TAG", it.toString())
-        }
-
-        return decryptedData.toString()
-    }
-
     private fun saveResults() {
+        //Log.e("TAG" ,"OLD Data\n" + decryptedResult.value)
+        //Log.e("TAG" , "mod ds data\n " + decryptedData.toPythonString())
+        //Log.e("TAG" ,"new Data\n" + modifiedData.value)
+
         if ( decryptedResult.value != modifiedData.value) {
+            Log.e("TAG", " writing to file")
             try {
                 getApplication<Application>().contentResolver
                     .openOutputStream(filepath.value!!, "w")?.buffered()?.let {

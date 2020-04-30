@@ -15,7 +15,7 @@
         app:layout_constraintStart_toStartOf="@+id/main_fragment_container"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <fragment
+    <androidx.fragment.app.FragmentContainerView
         android:id="@+id/main_fragment_container"
         android:name="com.example.simplepasswordkeeper.BaseFragment"
         android:layout_width="0dp"

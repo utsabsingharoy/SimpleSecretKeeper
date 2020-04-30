@@ -7,6 +7,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_main.*
@@ -25,17 +26,19 @@ class MainActivity : AppCompatActivity() {
         ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(application))
             .get(DataViewModel::class.java).let {
                 model = it
-                it.password.observe(this, Observer {
-                    supportFragmentManager.findFragmentByTag("PasswordFragment")?.let {
-                        supportFragmentManager.beginTransaction().remove(it).commit()
-                    }
-                })
 
                 it.filepath.observe(this, Observer {
                     PasswordFragment().show(
                         supportFragmentManager.beginTransaction(),
                         "PasswordFragment"
                     )
+                })
+
+                it.password.observe(this, Observer {
+                    supportFragmentManager.findFragmentByTag("PasswordFragment")?.let { dialogFragment ->
+                        supportFragmentManager.beginTransaction().remove(dialogFragment).commit()
+                        (dialogFragment as DialogFragment).dismiss()
+                    }
                 })
 
                 it.decryptedResult.observe(this, Observer {

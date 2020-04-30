@@ -31,5 +31,8 @@ class BaseFragment : Fragment() {
         encrypt_button.setOnClickListener {
             Toast.makeText(requireContext(), "Not Implemented", Toast.LENGTH_SHORT).show()
         }
+        change_password.setOnClickListener {
+            Toast.makeText(requireContext(), "Not Implemented", Toast.LENGTH_SHORT).show()
+        }
     }
 }
