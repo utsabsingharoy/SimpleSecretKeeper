@@ -47,15 +47,14 @@ class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
             floating_save_button.setOnClickListener {
 
-                /*
                 title_spinner.selectedItem.toString().let { current_element ->
                     (1..dataViewModel.decryptedData.getEntryCount(current_element)).map {
                         data_holder_layout.findViewWithTag<TextInputLayout>("ti_tag$it")!!.let {
-                            Pair(
+                            Triple(
                                 it.hint.toString(),
-                                it.findViewById<TextInputEditText>(R.id.ti_box)?.text.toString()
-                            ).also {
-                                Log.e("TAG", "pair " + it.toString())}
+                                it.findViewById<TextInputEditText>(R.id.ti_box)?.text.toString(),
+                                it.endIconMode == TextInputLayout.END_ICON_PASSWORD_TOGGLE
+                            )
                         }
                     }.let {
                         Log.e("TAG", "mod " + it.toString())
@@ -63,12 +62,12 @@ class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
                     }
                 }
                 dataViewModel.modifiedData.postValue(dataViewModel.decryptedData.toPythonString())
-                */
 
-                if(dataViewModel.decryptedResult.value!! == dataViewModel.decryptedData.toPythonString())
+
+                /*if(dataViewModel.decryptedResult.value!! == dataViewModel.decryptedData.toPythonString())
                     Log.e("TAG", "Same value")
                 else
-                    Log.e("TAG", title_spinner.selectedItem.toString())
+                    Log.e("TAG", title_spinner.selectedItem.toString())*/
             }
         }
     }
