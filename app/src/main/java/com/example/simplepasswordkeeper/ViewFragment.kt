@@ -13,13 +13,22 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelStoreOwner
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.password_fragment.view.*
 import kotlinx.android.synthetic.main.view_layout.*
 
-class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
+class ViewFragment() : Fragment(), AdapterView.OnItemSelectedListener {
+
+    private lateinit var  viewEditViewModel : ViewEditViewModel
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewEditViewModel = ViewModelProvider(parentFragment as ViewModelStoreOwner, ViewModelProvider.NewInstanceFactory()).get(ViewEditViewModel::class.java)
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -29,8 +38,8 @@ class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
         return inflater.inflate(R.layout.view_layout, container, false)
     }
 
-    private fun populateSpinner(model : DataViewModel) {
-        model.decryptedData.map { it.find{pair->pair.first == "title"}!!.second}.toList().let {
+    private fun populateSpinner() {
+        viewEditViewModel.decryptedData.map { it.find{pair->pair.first == "title"}!!.second}.toList().let {
             ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, it).also {
                 it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             }.let {
@@ -42,41 +51,42 @@ class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         title_spinner.onItemSelectedListener = this
-        ViewModelProvider(requireActivity(), ViewModelProvider.NewInstanceFactory()).get(DataViewModel::class.java).let { dataViewModel ->
-            populateSpinner(dataViewModel)
+        populateSpinner()
 
-            floating_save_button.setOnClickListener {
-
-                title_spinner.selectedItem.toString().let { current_element ->
-                    (1..dataViewModel.decryptedData.getEntryCount(current_element)).map {
-                        data_holder_layout.findViewWithTag<TextInputLayout>("ti_tag$it")!!.let {
-                            Triple(
-                                it.hint.toString(),
-                                it.findViewById<TextInputEditText>(R.id.ti_box)?.text.toString(),
-                                it.endIconMode == TextInputLayout.END_ICON_PASSWORD_TOGGLE
-                            )
-                        }
-                    }.let {
-                        Log.e("TAG", "mod " + it.toString())
-                        dataViewModel.decryptedData.modifyEntries(current_element, it)
+        floating_save_button.setOnClickListener {
+            title_spinner.selectedItem.toString().let { current_element ->
+                (1..viewEditViewModel.decryptedData.getEntryCount(current_element)).map {
+                    data_holder_layout.findViewWithTag<TextInputLayout>("ti_tag$it")!!.let {
+                        Triple(
+                            it.hint.toString(),
+                            it.findViewById<TextInputEditText>(R.id.ti_box)?.text.toString(),
+                            it.endIconMode == TextInputLayout.END_ICON_PASSWORD_TOGGLE
+                        )
                     }
+                }.let {
+                    Log.e("TAG", "mod " + it.toString())
+                    viewEditViewModel.decryptedData.modifyEntries(current_element, it)
                 }
-                dataViewModel.modifiedData.postValue(dataViewModel.decryptedData.toPythonString())
-
-
-                /*if(dataViewModel.decryptedResult.value!! == dataViewModel.decryptedData.toPythonString())
-                    Log.e("TAG", "Same value")
-                else
-                    Log.e("TAG", title_spinner.selectedItem.toString())*/
             }
+            ViewModelProvider(requireActivity(), ViewModelProvider.NewInstanceFactory())
+                .get(DataViewModel::class.java).let { dataViewModel ->
+                    dataViewModel.modifiedString.postValue(viewEditViewModel.decryptedData.toPythonString())
+            }
+
+            /*if(dataViewModel.decryptedResult.value!! == dataViewModel.decryptedData.toPythonString())
+                Log.e("TAG", "Same value")
+            else
+                Log.e("TAG", title_spinner.selectedItem.toString())*/
         }
+
+
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         data_holder_layout.removeAllViews()
         (ViewModelProvider(requireActivity(), ViewModelProvider.NewInstanceFactory()).get(DataViewModel::class.java)).let { dataViewModel ->
 
-            dataViewModel.decryptedData[position].mapIndexed { index, triple ->
+            viewEditViewModel.decryptedData[position].mapIndexed { index, triple ->
                 requireActivity().let {
                     layoutInflater.inflate(R.layout.outlined_textbox, null).let {
                         it?.findViewById<TextInputLayout>(R.id.ti_layout)?.apply {

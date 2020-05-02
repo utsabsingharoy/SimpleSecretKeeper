@@ -5,24 +5,8 @@ import org.json.JSONArray
 import org.json.JSONObject
 
 data class DecryptedData(val jsonString: String) : Iterable<MutableList<Triple<String,String, Boolean>>> {
-    //Data schema [title, value, isHidden
+    //Data schema [title, value, isHidden]
     private var decryptedData : MutableList<MutableList<Triple<String,String,Boolean>>>
-
-    private class JsonArrayIterable(val jsonArray: JSONArray) : Iterable<JSONObject> {
-        override fun iterator(): Iterator<JSONObject> = JsonArrayIterator(jsonArray)
-
-        private class JsonArrayIterator(val jsonArray: JSONArray) : Iterator<JSONObject> {
-            private  var i = 0
-            override fun hasNext() : Boolean{
-                return i < jsonArray.length()
-            }
-            override fun next() : JSONObject {
-                val obj = jsonArray.getJSONObject(i)
-                i++
-                return obj
-            }
-        }
-    }
 
     private fun findEntry(title: String) : MutableList<Triple<String,String, Boolean>>? {
         return decryptedData.find { kvTriple ->
@@ -85,7 +69,7 @@ data class DecryptedData(val jsonString: String) : Iterable<MutableList<Triple<S
 
     init {
         JSONArray(jsonString).let { jsonArray ->
-            JsonArrayIterable(jsonArray).map {
+            JsonUtilities.JsonArrayIterable(jsonArray).map {
                 var obj = mutableListOf<Triple<String, String,Boolean>>()
                 for (name in it.keys()) {
                     val pairArray = it.getJSONArray(name)
@@ -95,8 +79,8 @@ data class DecryptedData(val jsonString: String) : Iterable<MutableList<Triple<S
             }.toMutableList()
         }.also {
             decryptedData = it
-        }.forEach {
+        }/*.forEach {
             Log.e("TAG", it.toString())
-        }
+        }*/
     }
 }

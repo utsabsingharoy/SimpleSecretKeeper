@@ -3,9 +3,16 @@
     <string name="action_settings">Clear</string>
     <string name="appbar_scrolling_view_behavior">Secrets</string>
     <string name="encrypt_label">New</string>
-    <string name="decrypt_label">View</string>
+    <string name="decrypt_label">View / Edit</string>
     <string name="password_hint">password</string>
     <string name="ok_label">OK</string>
     <string name="enter_password">Enter Your Password</string>"
     <string name="change_password">Change Password</string>"
+    <string name="select_title">Select Title</string>
+    <string name="key">Key</string>
+    <string name="value">Value</string>
+    <string name="title">title</string>
+    <string name="view">View</string>
+    <string name="add_new">Add New</string>
+    <string name="delete">Delete</string>
 </resources>
