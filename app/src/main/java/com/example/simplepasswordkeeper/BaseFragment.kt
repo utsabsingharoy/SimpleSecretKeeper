@@ -45,7 +45,7 @@ class BaseFragment : Fragment() {
 
                     model.decryptedResultReady.observe(this, Observer {
                         supportFragmentManager.beginTransaction()
-                            .replace(R.id.main_fragment_container, ViewEditBaseFragment(model.decryptedString))
+                            .replace(R.id.main_fragment_container, ViewEditBaseFragment())
                             .addToBackStack("ViewEditBaseFragment").commit()
                     })
                 }

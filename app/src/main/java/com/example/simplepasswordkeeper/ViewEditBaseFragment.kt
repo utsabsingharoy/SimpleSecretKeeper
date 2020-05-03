@@ -8,14 +8,14 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.base_layout_with_bottom.*
 
-class ViewEditBaseFragment(var decryptedString : String) : Fragment() {
+class ViewEditBaseFragment() : Fragment() {
 
     private lateinit var viewModel: ViewEditViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(ViewEditViewModel::class.java)
-        viewModel.decryptedData = DecryptedData(decryptedString)
+        viewModel.persistentStorage = ViewModelProvider(requireActivity(), ViewModelProvider.NewInstanceFactory()).get(DataViewModel::class.java).storageAccess
     }
 
     override fun onCreateView(

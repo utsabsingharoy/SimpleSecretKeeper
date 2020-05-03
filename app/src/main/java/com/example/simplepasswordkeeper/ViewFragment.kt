@@ -21,7 +21,7 @@ import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.password_fragment.view.*
 import kotlinx.android.synthetic.main.view_layout.*
 
-class ViewFragment() : Fragment(), AdapterView.OnItemSelectedListener {
+class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
     private lateinit var  viewEditViewModel : ViewEditViewModel
 
@@ -39,7 +39,7 @@ class ViewFragment() : Fragment(), AdapterView.OnItemSelectedListener {
     }
 
     private fun populateSpinner() {
-        viewEditViewModel.decryptedData.map { it.find{pair->pair.first == "title"}!!.second}.toList().let {
+        viewEditViewModel.getTitles().let {
             ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, it).also {
                 it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             }.let {
@@ -54,8 +54,8 @@ class ViewFragment() : Fragment(), AdapterView.OnItemSelectedListener {
         populateSpinner()
 
         floating_save_button.setOnClickListener {
-            title_spinner.selectedItem.toString().let { current_element ->
-                (1..viewEditViewModel.decryptedData.getEntryCount(current_element)).map {
+            title_spinner.selectedItem.toString().let { current_element  ->
+                (1..viewEditViewModel.getEntryCount(current_element)).map {
                     data_holder_layout.findViewWithTag<TextInputLayout>("ti_tag$it")!!.let {
                         Triple(
                             it.hint.toString(),
@@ -65,12 +65,8 @@ class ViewFragment() : Fragment(), AdapterView.OnItemSelectedListener {
                     }
                 }.let {
                     Log.e("TAG", "mod " + it.toString())
-                    viewEditViewModel.decryptedData.modifyEntries(current_element, it)
+                    viewEditViewModel.saveModification(current_element, it)
                 }
-            }
-            ViewModelProvider(requireActivity(), ViewModelProvider.NewInstanceFactory())
-                .get(DataViewModel::class.java).let { dataViewModel ->
-                    dataViewModel.modifiedString.postValue(viewEditViewModel.decryptedData.toPythonString())
             }
 
             /*if(dataViewModel.decryptedResult.value!! == dataViewModel.decryptedData.toPythonString())
@@ -84,9 +80,8 @@ class ViewFragment() : Fragment(), AdapterView.OnItemSelectedListener {
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
         data_holder_layout.removeAllViews()
-        (ViewModelProvider(requireActivity(), ViewModelProvider.NewInstanceFactory()).get(DataViewModel::class.java)).let { dataViewModel ->
 
-            viewEditViewModel.decryptedData[position].mapIndexed { index, triple ->
+        viewEditViewModel.getDataAt(position).mapIndexed { index, triple ->
                 requireActivity().let {
                     layoutInflater.inflate(R.layout.outlined_textbox, null).let {
                         it?.findViewById<TextInputLayout>(R.id.ti_layout)?.apply {
@@ -125,11 +120,9 @@ class ViewFragment() : Fragment(), AdapterView.OnItemSelectedListener {
             }.forEach{
                 data_holder_layout.addView(it)
             }
-        }
     }
 
     override fun onNothingSelected(parent: AdapterView<*>?) {
-        TODO("Not yet implemented")
     }
 
     companion object {

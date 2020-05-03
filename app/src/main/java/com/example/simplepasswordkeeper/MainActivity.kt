@@ -7,10 +7,9 @@ import android.content.Intent
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.android.synthetic.main.activity_main.*
 
 
@@ -26,31 +25,18 @@ class MainActivity : AppCompatActivity() {
         requestedOrientation = SCREEN_ORIENTATION_PORTRAIT
 
         model = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(application)).get(DataViewModel::class.java)
-
-        /*ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(application))
-            .get(DataViewModel::class.java).let {
-                model = it
-
-                it.filepath.observe(this, Observer {
-                    PasswordFragment().show(
-                        supportFragmentManager.beginTransaction(),
-                        "PasswordFragment"
-                    )
-                })
-
-                it.password.observe(this, Observer {
-                    supportFragmentManager.findFragmentByTag("PasswordFragment")?.let { dialogFragment ->
-                        supportFragmentManager.beginTransaction().remove(dialogFragment).commit()
-                        (dialogFragment as DialogFragment).dismiss()
-                    }
-                })
-
-                it.decryptedResultReady.observe(this, Observer {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.main_fragment_container, ViewEditBaseFragment(model.decryptedString))
-                        .addToBackStack(null).commit()
-                })
-            }*/
+        model.password.observe(this, Observer {
+            PersistentStorageFactory(
+                PersistentStorageFactory.StorageInitDetails(application, model.password.value!!, model.filepath.value!!))
+                .create()?.let {
+                    model.storageAccess = it
+                    model.decryptedResultReady.postValue(true)
+                }?: {MaterialAlertDialogBuilder(this)
+                        .setTitle("Error")
+                        .setMessage("Storage Initialization failed. Check password or file")
+                        .setPositiveButton("Ok", null)
+                        .show()}()
+        })
     }
 
     fun sendFileActionIntentOpenDocument() {

@@ -2,19 +2,20 @@ package com.example.simplepasswordkeeper
 
 import android.util.Log
 import org.json.JSONArray
-import org.json.JSONObject
 
-data class DecryptedData(val jsonString: String) : Iterable<MutableList<Triple<String,String, Boolean>>> {
+typealias SchemaType = Triple<String,String,Boolean>
+
+class DecryptedData(jsonString: String) : Iterable<MutableList<SchemaType>> {
     //Data schema [title, value, isHidden]
-    private var decryptedData : MutableList<MutableList<Triple<String,String,Boolean>>>
+    private var decryptedData : MutableList<MutableList<SchemaType>>
 
-    private fun findEntry(title: String) : MutableList<Triple<String,String, Boolean>>? {
+    private fun findEntry(title: String) : MutableList<SchemaType>? {
         return decryptedData.find { kvTriple ->
             kvTriple.find { it.first == "title"}?.second == title
         }
     }
 
-    fun modifyEntries(oldTitle : String, entries : List<Triple<String, String, Boolean>>) {
+    fun modifyEntries(oldTitle : String, entries : List<SchemaType>) {
         Log.d("TAG", "old\n" + findEntry(oldTitle).toString())
         Log.d("TAG", "New\n" + entries.toString())
         findEntry(oldTitle)?.let { tripleList ->
@@ -31,7 +32,7 @@ data class DecryptedData(val jsonString: String) : Iterable<MutableList<Triple<S
         findEntry(oldTitle)?.add(Triple(key, value, hidden))
     }
 
-    fun addEntry(newEntry : List<Triple<String,String,Boolean>>) {
+    fun addEntry(newEntry : List<SchemaType>) {
         decryptedData.add(newEntry.toMutableList())
     }
 
@@ -39,7 +40,7 @@ data class DecryptedData(val jsonString: String) : Iterable<MutableList<Triple<S
         return findEntry(title)?.size?:0
     }
 
-    override fun iterator(): Iterator<MutableList<Triple<String, String, Boolean>>> = decryptedData.iterator()
+    override fun iterator(): Iterator<MutableList<Triple<String,String,Boolean>>> = decryptedData.iterator()
 
     operator fun get(i : Int) = decryptedData[i]
 

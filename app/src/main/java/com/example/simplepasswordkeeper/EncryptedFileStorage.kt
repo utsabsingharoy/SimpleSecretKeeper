@@ -9,29 +9,40 @@ typealias EncryptedFileAcessDetails = Pair<Uri, String>
 
 class EncryptedFileStorage(val application: Application, val accessDetail: EncryptedFileAcessDetails) : IPersistentStorageAccess {
 
-    override fun readFromPersistentStorage(): String {
-        var str = ""
+    override lateinit var decryptedData: DecryptedData
+
+    private fun readFromPersistentStorage() : Boolean {
         try {
-            str = application.contentResolver
+            application.contentResolver
                 .openInputStream(accessDetail.first)?.buffered()?.readBytes()?.let {
-                    NativeBridge().decryptValue(accessDetail.second, it).trim()
-                } ?: ""
+                    val str = NativeBridge().decryptValue(accessDetail.second, it).trim()
+                    if(!JsonUtilities.isValidJson(str))
+                        return false
+                    decryptedData = DecryptedData(str)
+                } ?: return false
         } catch (e : Exception) {
             e.printStackTrace()
+            return false
         }
-        return str
+        return true
     }
 
-    override fun writeToPersistentStorage(data: String) {
+    override fun writeToPersistentStorage() : Boolean {
         try {
             application.contentResolver
                 .openOutputStream(accessDetail.first, "w")?.buffered()?.let {
-                    it.write(NativeBridge().encryptString(accessDetail.second, data))
+                    it.write(NativeBridge().encryptString(accessDetail.second, decryptedData.toPythonString()))
                     it.flush()
                     Toast.makeText(application, "Saved", Toast.LENGTH_SHORT).show()
                 }
         } catch (e: IOException) {
             e.printStackTrace()
+            return false
         }
+        return true
+    }
+
+    override fun initialize(): Boolean {
+        return readFromPersistentStorage()
     }
 }
