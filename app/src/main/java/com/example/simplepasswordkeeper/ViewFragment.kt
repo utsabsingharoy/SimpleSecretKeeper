@@ -12,6 +12,8 @@ import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.biometric.BiometricManager
+import androidx.biometric.BiometricPrompt
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -64,7 +66,6 @@ class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
                         )
                     }
                 }.let {
-                    Log.e("TAG", "mod " + it.toString())
                     viewEditViewModel.saveModification(current_element, it)
                 }
             }
@@ -90,23 +91,26 @@ class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
                             if (triple.third) {
                                 //setEndIconDrawable(R.drawable.ic_visibility_black)
                                 endIconMode = TextInputLayout.END_ICON_PASSWORD_TOGGLE
-                                /*setEndIconOnClickListener {
+                                setEndIconOnClickListener {
                                     this.findViewById<TextInputEditText>(R.id.ti_box).let {
                                         if( it.transformationMethod is PasswordTransformationMethod) {
-                                            //add biometric
-                                            it.transformationMethod =
-                                                HideReturnsTransformationMethod.getInstance()
-                                            this.setEndIconDrawable(R.drawable.ic_visibility_off_black)
-                                            Toast.makeText(requireContext(), "unlocked", Toast.LENGTH_SHORT).show()
+                                            val func = {
+                                                it.transformationMethod =
+                                                    HideReturnsTransformationMethod.getInstance()
+                                                this.setEndIconDrawable(R.drawable.ic_visibility_off_black)
+                                                this.isEndIconVisible = true
+
+                                            }
+                                            setBiometricUnlock(func)
                                         }
                                         else {
                                             it.transformationMethod =
                                                 PasswordTransformationMethod.getInstance()
                                             this.setEndIconDrawable(R.drawable.ic_visibility_black)
-                                            Toast.makeText(requireContext(), "locked", Toast.LENGTH_SHORT).show()
+                                            this.isEndIconVisible = true
                                         }
                                     }
-                                }*/
+                                }
                             }
                         }
                         it?.findViewById<TextInputEditText>(R.id.ti_box)?.apply {
@@ -117,7 +121,7 @@ class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
                         it
                     }
                 }
-            }.forEach{
+            }.forEach {
                 data_holder_layout.addView(it)
             }
     }
@@ -125,8 +129,43 @@ class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
     override fun onNothingSelected(parent: AdapterView<*>?) {
     }
 
-    companion object {
-        const val INPUT_TYPE_PASSWORD = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-        const val INPUT_TYPE_TEXT = InputType.TYPE_CLASS_TEXT
+    private fun setBiometricUnlock(successCallback : ()->Unit) {
+        if (BiometricManager.from(requireContext()).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
+            requireActivity().applicationContext.let { applicationContext ->
+                BiometricPrompt(this, requireActivity().mainExecutor,
+                    object : BiometricPrompt.AuthenticationCallback() {
+                        override fun onAuthenticationError(
+                            errorCode: Int,
+                            errString: CharSequence
+                        ) {
+                            super.onAuthenticationError(errorCode, errString)
+                            Toast.makeText(applicationContext,
+                                "Authentication error: $errString", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                        override fun onAuthenticationSucceeded(
+                            result: BiometricPrompt.AuthenticationResult
+                        ) {
+                            super.onAuthenticationSucceeded(result)
+                            successCallback()
+                        }
+
+                        override fun onAuthenticationFailed() {
+                            super.onAuthenticationFailed()
+                            Toast.makeText(applicationContext,
+                                "Authentication failed", Toast.LENGTH_SHORT)
+                                .show()
+                        }
+                    }
+                ).authenticate(
+                    BiometricPrompt.PromptInfo.Builder()
+                        .setTitle("Biometric login to view field")
+                        .setSubtitle("Log in using your biometric credential")
+                        .setNegativeButtonText("Cancel")
+                        .build()
+                )
+            }
+        } else
+            successCallback()
     }
 }

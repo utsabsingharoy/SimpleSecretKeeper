@@ -12,5 +12,4 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     var decryptedResultReady = MutableLiveData<Boolean>()
 
     lateinit var storageAccess: IPersistentStorageAccess
-
 }
