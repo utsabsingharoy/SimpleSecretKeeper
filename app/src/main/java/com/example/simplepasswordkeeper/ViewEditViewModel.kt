@@ -1,8 +1,6 @@
 package com.example.simplepasswordkeeper
 
-import android.widget.ArrayAdapter
 import androidx.lifecycle.ViewModel
-import java.text.FieldPosition
 
 class ViewEditViewModel : ViewModel() {
 
@@ -25,6 +23,13 @@ class ViewEditViewModel : ViewModel() {
     fun saveModification(currentSelection:String, data : List<SchemaType>) {
         persistentStorage.run {
             decryptedData.modifyEntries(currentSelection, data)
+            writeToPersistentStorage()
+        }
+    }
+
+    fun addAndSaveNewEntry(newEntry : List<SchemaType>) {
+        persistentStorage.run {
+            decryptedData.addEntry(newEntry)
             writeToPersistentStorage()
         }
     }

@@ -7,6 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
@@ -47,27 +48,44 @@ class AddEntryFragment : Fragment() {
     private fun saveEntry() {
         if(newItemCount == 0)
             return
-        if(title_value.text.toString().isBlank())
-            return
-        val list : MutableList<Triple<String,String,Boolean>> =
-        mutableListOf(Triple("title", title_value.text.toString(), false )).let {
-            it.addAll(
-                    (0 until newItemCount - 1).map {
-                        add_entry_layout.findViewWithTag<LinearLayout>("add_entry_tag$it")!!.let {
-                            val key =
-                                it.findViewById<TextInputEditText>(R.id.entry_key)!!.text.toString()
-                            val value =
-                                it.findViewById<TextInputEditText>(R.id.entry_value)!!.text.toString()
-                            val hidden =
-                                it.findViewById<TextInputEditText>(R.id.entry_value)!!.transformationMethod is PasswordTransformationMethod
 
-                            Triple(key, value, hidden)
-                        }
-                    }
-            )
-            it
+        listOf (
+            Pair({title_value.text.toString().isBlank()}, "Title can't be Blank") ,
+            Pair({ viewEditViewModel.getTitles().contains(title_value.text.toString())},"Duplicate Title")
+        ).firstOrNull{it.first()}?.run {
+            Toast.makeText(requireContext(), this.second, Toast.LENGTH_SHORT).show()
+            return
         }
 
-        Log.e("TAG1", list.toString())
+        (0 until newItemCount).map {
+            add_entry_layout.findViewWithTag<LinearLayout>("add_entry_tag$it")!!.let {
+                val key =
+                    it.findViewById<TextInputEditText>(R.id.entry_key)!!.text.toString()
+                val value =
+                    it.findViewById<TextInputEditText>(R.id.entry_value)!!.text.toString()
+                val hidden =
+                    it.findViewById<TextInputEditText>(R.id.entry_value)!!.transformationMethod is PasswordTransformationMethod
+                Triple(key, value, hidden)
+            }
+        }.takeIf { list -> list.none {
+            it.first.isBlank() && !it.second.isBlank()} }?.apply { this
+
+            (listOf(Triple("title", title_value.text.toString(), false)) + this).let {
+                viewEditViewModel.addAndSaveNewEntry(it)
+            }.also {
+                (0 until newItemCount).map {
+                    "add_entry_tag$it"
+                }.mapNotNull {
+                    add_entry_layout.findViewWithTag<LinearLayout>(it)
+                }.forEach {
+                    add_entry_layout.removeView(it)
+                }
+                title_value.setText("")
+                newItemCount = 0
+            }
+
+        }?:run{
+            Toast.makeText(requireContext(), "Keys can't be Blank", Toast.LENGTH_SHORT).show()
+        }
     }
 }
