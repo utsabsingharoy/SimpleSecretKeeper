@@ -68,22 +68,22 @@ class AddEntryFragment : Fragment() {
                 Triple(key, value, hidden)
             }
         }.takeIf { list -> list.none {
-            it.first.isBlank() && !it.second.isBlank()} }?.apply { this
-
-            (listOf(Triple("title", title_value.text.toString(), false)) + this).let {
-                viewEditViewModel.addAndSaveNewEntry(it)
-            }.also {
-                (0 until newItemCount).map {
-                    "add_entry_tag$it"
-                }.mapNotNull {
-                    add_entry_layout.findViewWithTag<LinearLayout>(it)
-                }.forEach {
-                    add_entry_layout.removeView(it)
+            it.first.isBlank() && !it.second.isBlank()} }?.apply {
+            BiometricUnlock.setBiometricUnlock(requireActivity()) {
+                (listOf(Triple("title", title_value.text.toString(), false)) + this).let {
+                    viewEditViewModel.addAndSaveNewEntry(it)
+                }.also {
+                    (0 until newItemCount).map {
+                        "add_entry_tag$it"
+                    }.mapNotNull {
+                        add_entry_layout.findViewWithTag<LinearLayout>(it)
+                    }.forEach {
+                        add_entry_layout.removeView(it)
+                    }
+                    title_value.setText("")
+                    newItemCount = 0
                 }
-                title_value.setText("")
-                newItemCount = 0
             }
-
         }?:run{
             Toast.makeText(requireContext(), "Keys can't be Blank", Toast.LENGTH_SHORT).show()
         }

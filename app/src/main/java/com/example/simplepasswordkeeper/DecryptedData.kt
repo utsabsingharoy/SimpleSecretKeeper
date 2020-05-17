@@ -23,7 +23,6 @@ class DecryptedData(jsonString: String) : Iterable<MutableList<SchemaType>> {
                 if(triple.first == entries[index].first &&
                     ((triple.second != entries[index].second) || (triple.third != entries[index].third)))
                     tripleList[index] = Triple(entries[index].first, entries[index].second, entries[index].third)
-
             }
         }
     }
