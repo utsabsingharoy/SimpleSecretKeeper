@@ -15,21 +15,25 @@ class DecryptedData(jsonString: String) : Iterable<MutableList<SchemaType>> {
         }
     }
 
-    fun modifyEntries(oldTitle : String, entries : List<SchemaType>) {
-        Log.d("TAG", "old\n" + findEntry(oldTitle).toString())
-        Log.d("TAG", "New\n" + entries.toString())
-        findEntry(oldTitle)?.let { tripleList ->
-            tripleList.forEachIndexed { index, triple ->
-                if(triple.first == entries[index].first &&
-                    ((triple.second != entries[index].second) || (triple.third != entries[index].third)))
-                    tripleList[index] = Triple(entries[index].first, entries[index].second, entries[index].third)
-            }
+    fun getTitles() : List<String> {
+        return decryptedData.map { it.find{it.first == "title"}!!.second}
+    }
+
+    fun modifyEntrie(title : String, modEntry : List<SchemaType>) {
+        //Remove the old and add the new entry in that position
+        getTitles().indexOf(title).let {index : Int->
+            decryptedData.removeAt(index)
+            decryptedData.add(index, modEntry.toMutableList())
         }
     }
 
-    fun addField(oldTitle : String, key : String, value : String, hidden : Boolean) {
-        findEntry(oldTitle)?.add(Triple(key, value, hidden))
+    fun deleteEntry(oldTitle: String) {
+        decryptedData.removeIf { it.find{ it.first == "title"}?.second == oldTitle}
     }
+
+    //fun addField(oldTitle : String, key : String, value : String, hidden : Boolean) {
+    //    findEntry(oldTitle)?.add(Triple(key, value, hidden))
+    //}
 
     fun addEntry(newEntry : List<SchemaType>) {
         decryptedData.add(newEntry.toMutableList())

@@ -12,6 +12,6 @@
         android:icon="@drawable/add_black"/>
     <item
         android:id="@+id/bottom_delete"
-        android:title="@string/delete"
-        android:icon="@drawable/remove_black"/>
+        android:title="@string/edit"
+        android:icon="@drawable/ic_edit"/>
 </menu>

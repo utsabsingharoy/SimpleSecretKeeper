@@ -14,10 +14,11 @@ import androidx.lifecycle.ViewModelStoreOwner
 import com.google.android.material.textfield.TextInputEditText
 import kotlinx.android.synthetic.main.add_entry_fragment.*
 
-class AddEntryFragment : Fragment() {
+open class AddEntryFragment : Fragment(), ISavableActions{
 
-    private var newItemCount = 0
-    private lateinit var  viewEditViewModel : ViewEditViewModel
+    protected var newItemCount = 0
+    protected lateinit var  viewEditViewModel : ViewEditViewModel
+    protected var editMode = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,14 +46,15 @@ class AddEntryFragment : Fragment() {
         save_button_add_entry.setOnClickListener { saveEntry() }
     }
 
-    private fun saveEntry() {
+    protected fun saveEntry() {
         if(newItemCount == 0)
             return
 
-        listOf (
-            Pair({title_value.text.toString().isBlank()}, "Title can't be Blank") ,
-            Pair({ viewEditViewModel.getTitles().contains(title_value.text.toString())},"Duplicate Title")
-        ).firstOrNull{it.first()}?.run {
+        listOf(
+            Pair({ title_value.text.toString().isBlank() }, "Title can't be Blank"),
+            Pair({ !editMode && viewEditViewModel.getTitles().contains(title_value.text.toString()) },
+                "Duplicate Title")
+        ).firstOrNull { it.first() }?.run {
             Toast.makeText(requireContext(), this.second, Toast.LENGTH_SHORT).show()
             return
         }
@@ -70,22 +72,35 @@ class AddEntryFragment : Fragment() {
         }.takeIf { list -> list.none {
             it.first.isBlank() && !it.second.isBlank()} }?.apply {
             BiometricUnlock.setBiometricUnlock(requireActivity()) {
-                (listOf(Triple("title", title_value.text.toString(), false)) + this).let {
-                    viewEditViewModel.addAndSaveNewEntry(it)
+                (listOf(Triple("title", title_value.text.toString(), false)) + this).filter {
+                    !(it.first.isBlank() && it.second.isBlank())
+                }.let {
+                    onSaveButtonClicked(it)
                 }.also {
-                    (0 until newItemCount).map {
-                        "add_entry_tag$it"
-                    }.mapNotNull {
-                        add_entry_layout.findViewWithTag<LinearLayout>(it)
-                    }.forEach {
-                        add_entry_layout.removeView(it)
-                    }
-                    title_value.setText("")
-                    newItemCount = 0
+                    cleanUpActions()
                 }
             }
         }?:run{
             Toast.makeText(requireContext(), "Keys can't be Blank", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    protected fun cleanUpView() {
+        (0 until newItemCount).map {
+            "add_entry_tag$it"
+        }.mapNotNull {
+            add_entry_layout.findViewWithTag<LinearLayout>(it)
+        }.forEach {
+            add_entry_layout.removeView(it)
+        }
+        title_value.setText("")
+        newItemCount = 0
+    }
+    override fun cleanUpActions() {
+        cleanUpView()
+    }
+
+    override fun onSaveButtonClicked(saveData : List<SchemaType>) {
+        viewEditViewModel.addAndSaveNewEntry(saveData)
     }
 }

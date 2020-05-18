@@ -48,26 +48,10 @@ class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
         title_spinner.onItemSelectedListener = this
         populateSpinner()
 
-        floating_save_button.setOnClickListener {
-            title_spinner.selectedItem.toString().let { current_element  ->
-                (1..viewEditViewModel.getEntryCount(current_element)).map {
-                    data_holder_layout.findViewWithTag<TextInputLayout>("ti_tag$it")!!.let {
-                        Triple(
-                            it.hint.toString(),
-                            it.findViewById<TextInputEditText>(R.id.ti_box)?.text.toString(),
-                            it.endIconMode == TextInputLayout.END_ICON_PASSWORD_TOGGLE
-                        )
-                    }
-                }.let {
-                    viewEditViewModel.saveModification(current_element, it)
-                }
-            }
-
-            /*if(dataViewModel.decryptedResult.value!! == dataViewModel.decryptedData.toPythonString())
-                Log.e("TAG", "Same value")
-            else
-                Log.e("TAG", title_spinner.selectedItem.toString())*/
-        }
+        //Add a confirmation dialog
+        //floating_delete_button.setOnClickListener {
+        //    viewEditViewModel.deleteEntry(title_spinner.selectedItem.toString())
+        //}
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -105,6 +89,7 @@ class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
                     }
                     it?.findViewById<TextInputEditText>(R.id.ti_box)?.apply {
                         setText(triple.second)
+                        isEnabled = false
                         if(triple.third)
                             inputType = (InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD)
                     }

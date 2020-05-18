@@ -15,4 +15,5 @@
     <string name="view">View</string>
     <string name="add_new">Add New</string>
     <string name="delete">Delete</string>
+    <string name="edit">Edit</string>
 </resources>

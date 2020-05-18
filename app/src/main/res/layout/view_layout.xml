@@ -3,14 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="30dp"
-        >
+        android:layout_margin="30dp">
 
         <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/title_header"
@@ -52,28 +50,16 @@
         </LinearLayout>
     </ScrollView>
 
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floating_add_row"
+        android:id="@+id/floating_delete_button"
         style="@style/Widget.MaterialComponents.FloatingActionButton"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
         android:layout_weight=".175"
         android:layout_gravity="bottom|end"
         android:layout_margin="10dp"
-        app:srcCompat="@drawable/add_black"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintLeft_toRightOf="@+id/title_spinner"/>
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/floating_save_button"
-        style="@style/Widget.MaterialComponents.FloatingActionButton"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_weight=".175"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="10dp"
-        app:srcCompat="@drawable/ic_save_black"
+        app:srcCompat="@drawable/ic_delete"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintRight_toRightOf="parent"

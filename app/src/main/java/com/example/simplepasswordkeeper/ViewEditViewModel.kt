@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 
 class ViewEditViewModel : ViewModel() {
 
-    //lateinit var decryptedData : DecryptedData
     lateinit var persistentStorage : IPersistentStorageAccess
 
     fun getDataAt(position: Int) : List<SchemaType> {
@@ -12,8 +11,7 @@ class ViewEditViewModel : ViewModel() {
     }
 
     fun getTitles() : List<String> {
-        return persistentStorage.decryptedData
-            .map { it.find{pair->pair.first == "title"}!!.second}
+        return persistentStorage.decryptedData.getTitles()
     }
 
     fun getEntryCount(currentElement : String) : Int {
@@ -22,7 +20,7 @@ class ViewEditViewModel : ViewModel() {
 
     fun saveModification(currentSelection:String, data : List<SchemaType>) {
         persistentStorage.run {
-            decryptedData.modifyEntries(currentSelection, data)
+            decryptedData.modifyEntrie(currentSelection, data)
             writeToPersistentStorage()
         }
     }
@@ -32,5 +30,13 @@ class ViewEditViewModel : ViewModel() {
             decryptedData.addEntry(newEntry)
             writeToPersistentStorage()
         }
+    }
+
+    fun deleteEntry(title : String) {
+        persistentStorage.run {
+            decryptedData.deleteEntry(title)
+            writeToPersistentStorage()
+        }
+
     }
 }

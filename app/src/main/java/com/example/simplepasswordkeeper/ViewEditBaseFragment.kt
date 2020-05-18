@@ -30,14 +30,27 @@ class ViewEditBaseFragment() : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bottom_bar.setOnNavigationItemSelectedListener {
-            run {
+            /*run {
                 when (it.itemId) {
                     R.id.bottom_view -> ViewFragment()
                     R.id.bottom_add -> AddEntryFragment()
+                    R.id.bottom_delete ->
                     else -> Fragment()
                 }
             }.let {
                 childFragmentManager.beginTransaction().replace(R.id.view_edit_fragment_container, it).commit()
+            }*/
+            run {
+                when (it.itemId) {
+                    R.id.bottom_view -> childFragmentManager.beginTransaction().replace(R.id.view_edit_fragment_container, ViewFragment()).commit()
+                    R.id.bottom_add -> childFragmentManager.beginTransaction().replace(R.id.view_edit_fragment_container, AddEntryFragment()).commit()
+                    R.id.bottom_delete -> {
+                        BiometricUnlock.setBiometricUnlock(requireActivity()){
+                            childFragmentManager.beginTransaction().replace(R.id.view_edit_fragment_container, EditEntryFragment()).commit()
+                        }
+                    }
+                    else -> Fragment()
+                }
             }
             true
         }
