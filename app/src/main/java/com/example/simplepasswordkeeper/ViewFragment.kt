@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.text.InputType
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,6 +13,8 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
+import androidx.ui.material.AlertDialog
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import kotlinx.android.synthetic.main.view_layout.*
@@ -48,10 +51,25 @@ class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
         title_spinner.onItemSelectedListener = this
         populateSpinner()
 
-        //Add a confirmation dialog
-        //floating_delete_button.setOnClickListener {
-        //    viewEditViewModel.deleteEntry(title_spinner.selectedItem.toString())
-        //}
+        floating_delete_button.setOnClickListener {
+            MaterialAlertDialogBuilder(requireContext())
+                .setTitle("Alert")
+                .setMessage("Delete ${title_spinner.selectedItem}?")
+                .setPositiveButton(R.string.delete) {_, _ ->
+                    title_spinner.selectedItem.toString().let {title->
+                        (viewEditViewModel.getTitles().indexOf(title)
+                            .takeIf {index-> index != viewEditViewModel.getTitles().size - 1}?:0)
+                            .also {viewEditViewModel.deleteEntry(title)}
+                            .let { nextPos ->
+                                populateSpinner()
+                                if(nextPos >  -1)
+                                    title_spinner.setSelection(nextPos)
+                            }
+                    }
+                }
+                .setNegativeButton("Cancel") {_, _ ->  }
+                .show()
+        }
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
