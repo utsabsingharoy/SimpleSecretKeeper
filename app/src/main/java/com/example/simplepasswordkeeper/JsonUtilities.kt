@@ -6,7 +6,7 @@ import org.json.JSONObject
 
 class JsonUtilities {
 
-    class JsonArrayIterable(val jsonArray: JSONArray) : Iterable<JSONObject> {
+    class JsonArrayIterable(private val jsonArray: JSONArray) : Iterable<JSONObject> {
         override fun iterator(): Iterator<JSONObject> = JsonArrayIterator(jsonArray)
 
         private class JsonArrayIterator(val jsonArray: JSONArray) : Iterator<JSONObject> {

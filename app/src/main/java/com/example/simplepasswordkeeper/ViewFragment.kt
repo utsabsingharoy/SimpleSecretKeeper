@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.text.InputType
 import android.text.method.HideReturnsTransformationMethod
 import android.text.method.PasswordTransformationMethod
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,19 +12,20 @@ import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.ViewModelStoreOwner
-import androidx.ui.material.AlertDialog
+import com.example.simplepasswordkeeper.databinding.ViewLayoutBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import kotlinx.android.synthetic.main.view_layout.*
 
 class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
 
     private lateinit var  viewEditViewModel : ViewEditViewModel
+    private var viewLayoutBinding: ViewLayoutBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewEditViewModel = ViewModelProvider(parentFragment as ViewModelStoreOwner, ViewModelProvider.NewInstanceFactory()).get(ViewEditViewModel::class.java)
+        viewEditViewModel = ViewModelProvider(parentFragment as ViewModelStoreOwner,
+            ViewModelProvider.NewInstanceFactory())[ViewEditViewModel::class.java]
     }
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -33,37 +33,43 @@ class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
         savedInstanceState: Bundle?
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.inflate(R.layout.view_layout, container, false)
+        viewLayoutBinding = ViewLayoutBinding.inflate(inflater, container, false)
+        return viewLayoutBinding?.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewLayoutBinding = null
     }
 
     private fun populateSpinner() {
-        viewEditViewModel.getTitles().let {
+        viewEditViewModel.getTitles().let { it ->
             ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, it).also {
                 it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             }.let {
-                title_spinner.adapter = it
+                viewLayoutBinding?.titleSpinner?.adapter = it
             }
         }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        title_spinner.onItemSelectedListener = this
+        viewLayoutBinding?.titleSpinner?.onItemSelectedListener = this
         populateSpinner()
 
-        floating_delete_button.setOnClickListener {
+        viewLayoutBinding?.floatingDeleteButton?.setOnClickListener {
             MaterialAlertDialogBuilder(requireContext())
                 .setTitle("Alert")
-                .setMessage("Delete ${title_spinner.selectedItem}?")
+                .setMessage("Delete ${ viewLayoutBinding?.titleSpinner?.selectedItem}?")
                 .setPositiveButton(R.string.delete) {_, _ ->
-                    title_spinner.selectedItem.toString().let {title->
+                    viewLayoutBinding?.titleSpinner?.selectedItem.toString().let {title->
                         (viewEditViewModel.getTitles().indexOf(title)
                             .takeIf {index-> index != viewEditViewModel.getTitles().size - 1}?:0)
                             .also {viewEditViewModel.deleteEntry(title)}
                             .let { nextPos ->
                                 populateSpinner()
                                 if(nextPos >  -1)
-                                    title_spinner.setSelection(nextPos)
+                                    viewLayoutBinding?.titleSpinner?.setSelection(nextPos)
                             }
                     }
                 }
@@ -73,7 +79,7 @@ class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
     }
 
     override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        data_holder_layout.removeAllViews()
+        viewLayoutBinding?.dataHolderLayout?.removeAllViews()
 
         viewEditViewModel.getDataAt(position).mapIndexed { index, triple ->
             requireActivity().let {
@@ -115,7 +121,7 @@ class ViewFragment : Fragment(), AdapterView.OnItemSelectedListener {
                 }
             }
         }.forEach {
-            data_holder_layout.addView(it)
+            viewLayoutBinding?.dataHolderLayout?.addView(it)
         }
     }
 

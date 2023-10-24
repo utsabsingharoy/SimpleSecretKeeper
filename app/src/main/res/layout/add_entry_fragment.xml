@@ -7,6 +7,7 @@
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
+        android:id="@+id/top_layout"
         android:layout_height="wrap_content">
 
     <com.google.android.material.textfield.TextInputLayout
@@ -42,7 +43,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="10dp"
-        app:srcCompat="@drawable/add_black">
+        app:srcCompat="@drawable/add_black"
+        android:contentDescription="@string/add_button" >
     </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -52,7 +54,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
         android:layout_margin="10dp"
-        app:srcCompat="@drawable/ic_save_black">
+        app:srcCompat="@drawable/ic_save_black"
+        android:contentDescription="@string/save_button" >
     </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
 </LinearLayout>

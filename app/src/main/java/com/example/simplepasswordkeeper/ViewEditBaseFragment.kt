@@ -6,16 +6,18 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.android.synthetic.main.base_layout_with_bottom.*
+import com.example.simplepasswordkeeper.databinding.BaseLayoutWithBottomBinding
 
-class ViewEditBaseFragment() : Fragment() {
+class ViewEditBaseFragment : Fragment() {
 
     private lateinit var viewModel: ViewEditViewModel
+    private var baseLayoutBottomBinding: BaseLayoutWithBottomBinding? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory()).get(ViewEditViewModel::class.java)
-        viewModel.persistentStorage = ViewModelProvider(requireActivity(), ViewModelProvider.NewInstanceFactory()).get(DataViewModel::class.java).storageAccess
+        viewModel = ViewModelProvider(this, ViewModelProvider.NewInstanceFactory())[ViewEditViewModel::class.java]
+        viewModel.persistentStorage = ViewModelProvider(requireActivity(),
+            ViewModelProvider.NewInstanceFactory())[DataViewModel::class.java].storageAccess
     }
 
     override fun onCreateView(
@@ -24,12 +26,18 @@ class ViewEditBaseFragment() : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.inflate(R.layout.base_layout_with_bottom, container, false)
+        baseLayoutBottomBinding = BaseLayoutWithBottomBinding.inflate(inflater, container, false)
+        return baseLayoutBottomBinding?.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        baseLayoutBottomBinding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        bottom_bar.setOnNavigationItemSelectedListener {
+        baseLayoutBottomBinding?.bottomBar?.setOnNavigationItemSelectedListener {
             /*run {
                 when (it.itemId) {
                     R.id.bottom_view -> ViewFragment()

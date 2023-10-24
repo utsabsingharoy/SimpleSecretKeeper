@@ -7,27 +7,35 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.android.synthetic.main.password_fragment.*
-
+import com.example.simplepasswordkeeper.databinding.PasswordFragmentBinding
 class PasswordFragment : DialogFragment () {
 
+    private var passwordFragmentBinding: PasswordFragmentBinding? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.inflate(R.layout.password_fragment, container, false)
+        passwordFragmentBinding = PasswordFragmentBinding.inflate(inflater, container, false)
+        return passwordFragmentBinding?.root
+        //return inflater.inflate(R.layout.password_fragment, container, false) <<--Delete this
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        passwordFragmentBinding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        OK_button.setOnClickListener {
-            if (password_field.text?.isBlank()?:false)
+        passwordFragmentBinding?.OKButton?.setOnClickListener {
+            if (passwordFragmentBinding?.passwordField?.text?.isBlank() == true)
                 Toast.makeText(this.context, "Enter password", Toast.LENGTH_SHORT).show()
             else {
-                activity?.let { ViewModelProvider(it, ViewModelProvider.NewInstanceFactory()).get(DataViewModel::class.java)}!!
-                    .password.postValue(password_field.text.toString())
+                activity?.let {
+                    ViewModelProvider(it, ViewModelProvider.NewInstanceFactory())[DataViewModel::class.java] }!!
+                    .password.postValue(passwordFragmentBinding?.passwordField?.text.toString())
             }
         }
     }

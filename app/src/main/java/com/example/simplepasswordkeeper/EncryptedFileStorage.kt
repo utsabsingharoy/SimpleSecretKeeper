@@ -5,9 +5,9 @@ import android.net.Uri
 import android.widget.Toast
 import java.io.IOException
 
-typealias EncryptedFileAcessDetails = Pair<Uri, String>
+typealias EncryptedFileAccessDetails = Pair<Uri, String>
 
-class EncryptedFileStorage(val application: Application, val accessDetail: EncryptedFileAcessDetails) : IPersistentStorageAccess {
+class EncryptedFileStorage(val application: Application, private val accessDetail: EncryptedFileAccessDetails) : IPersistentStorageAccess {
 
     override lateinit var decryptedData: DecryptedData
 

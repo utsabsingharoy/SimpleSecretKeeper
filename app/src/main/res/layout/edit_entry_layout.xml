@@ -33,6 +33,8 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <include layout="@layout/add_entry_fragment"/>
+    <include
+        android:id="@+id/add_entry_layout"
+        layout="@layout/add_entry_fragment"/>
 
 </LinearLayout>

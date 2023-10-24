@@ -1,6 +1,5 @@
 package com.example.simplepasswordkeeper
 
-import android.util.Log
 import org.json.JSONArray
 
 typealias SchemaType = Triple<String,String,Boolean>
@@ -16,10 +15,10 @@ class DecryptedData(jsonString: String) : Iterable<MutableList<SchemaType>> {
     }
 
     fun getTitles() : List<String> {
-        return decryptedData.map { it.find{it.first == "title"}!!.second}
+        return decryptedData.map { it -> it.find{it.first == "title"}!!.second}
     }
 
-    fun modifyEntrie(title : String, modEntry : List<SchemaType>) {
+    fun modifyEntry(title : String, modEntry : List<SchemaType>) {
         //Remove the old and add the new entry in that position
         getTitles().indexOf(title).let {index : Int->
             decryptedData.removeAt(index)
@@ -58,23 +57,23 @@ class DecryptedData(jsonString: String) : Iterable<MutableList<SchemaType>> {
                         "            \"" + triple.second + "\",\n" +
                         "            " + triple.third.toString() + "\n" +
                         "        ]"
-                    }.applyToAllButLast { item -> item + "," }
+                    }.applyToAllButLast { item -> "$item," }
                         .fold("") { acc, s -> acc + s + "\n" }
                 }.map {
-                    "    {\n" + it + "    }"
+                        "    {\n$it    }"
                 }.applyToAllButLast {
-                    it + ","
+                        "$it,"
                 }.fold("") {acc, s ->
                     acc + s + "\n"
                 }.run {
-                    "[\n" + this + "]"
+                    "[\n$this]"
                 }
     }
 
     init {
         JSONArray(jsonString).let { jsonArray ->
             JsonUtilities.JsonArrayIterable(jsonArray).map {
-                var obj = mutableListOf<Triple<String, String,Boolean>>()
+                val obj = mutableListOf<Triple<String, String,Boolean>>()
                 for (name in it.keys()) {
                     val pairArray = it.getJSONArray(name)
                     obj.add(Triple(name, pairArray.getString(0), pairArray.getBoolean(1)))

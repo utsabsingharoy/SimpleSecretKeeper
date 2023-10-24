@@ -6,7 +6,7 @@
 #include "../../../../CryptoppLib/cryptopp_core.h"
 
 std::string JstrToCppstr(JNIEnv* env, jstring str) {
-    const char* char_arr = env->GetStringUTFChars(str, NULL);
+    const char* char_arr = env->GetStringUTFChars(str, nullptr);
     size_t size = env->GetStringLength(str);
     std::string cpp_str(char_arr, size);
     env->ReleaseStringUTFChars(str, char_arr);

@@ -2,6 +2,7 @@
 
 package com.example.simplepasswordkeeper
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
@@ -10,32 +11,36 @@ import android.os.Bundle
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.android.synthetic.main.activity_main.*
-
+import com.example.simplepasswordkeeper.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var model : DataViewModel
+    private lateinit var activityMainBinding: ActivityMainBinding
 
+    @SuppressLint("SourceLockedOrientationActivity")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        setContentView(R.layout.activity_main)
-        setSupportActionBar(materialToolbar)
+        activityMainBinding = ActivityMainBinding.inflate(layoutInflater)
+        val view = activityMainBinding.root
+        setContentView(view)
+        setSupportActionBar(activityMainBinding.materialToolbar)
         requestedOrientation = SCREEN_ORIENTATION_PORTRAIT
 
-        model = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory.getInstance(application)).get(DataViewModel::class.java)
+        model = ViewModelProvider(this, ViewModelProvider.AndroidViewModelFactory
+                            .getInstance(application))[DataViewModel::class.java]
         model.password.observe(this, Observer {
             PersistentStorageFactory(
                 PersistentStorageFactory.StorageInitDetails(application, model.password.value!!, model.filepath.value!!))
                 .create()?.let {
                     model.storageAccess = it
                     model.decryptedResultReady.postValue(true)
-                }?: {MaterialAlertDialogBuilder(this)
-                        .setTitle("Error")
-                        .setMessage("Storage Initialization failed. Check password or file")
-                        .setPositiveButton("Ok", null)
-                        .show()}()
+                }?: MaterialAlertDialogBuilder(this)
+                .setTitle("Error")
+                .setMessage("Storage Initialization failed. Check password or file")
+                .setPositiveButton("Ok", null)
+                .show()
         })
     }
 

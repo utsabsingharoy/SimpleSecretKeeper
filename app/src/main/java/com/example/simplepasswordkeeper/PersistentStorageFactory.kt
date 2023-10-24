@@ -3,10 +3,10 @@ package com.example.simplepasswordkeeper
 import android.app.Application
 import android.net.Uri
 
-class PersistentStorageFactory(val storageInitDetails: StorageInitDetails) {
+class PersistentStorageFactory(private val storageInitDetails: StorageInitDetails) {
     fun create(/*type*/) : IPersistentStorageAccess? {
         val encryptedFileStorage = EncryptedFileStorage(storageInitDetails.application,
-            EncryptedFileAcessDetails(storageInitDetails.filepath, storageInitDetails.password ))
+            EncryptedFileAccessDetails(storageInitDetails.filepath, storageInitDetails.password ))
         if(encryptedFileStorage.initialize())
             return encryptedFileStorage
         return null

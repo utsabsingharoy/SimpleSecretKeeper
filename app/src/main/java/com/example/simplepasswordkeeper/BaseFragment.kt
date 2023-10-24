@@ -9,24 +9,31 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import kotlinx.android.synthetic.main.base_fragment.*
-
+import com.example.simplepasswordkeeper.databinding.BaseFragmentBinding
 class BaseFragment : Fragment() {
+    private var baseFragmentBinding: BaseFragmentBinding? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         super.onCreateView(inflater, container, savedInstanceState)
-        return inflater.inflate(R.layout.base_fragment, container, false)
+        baseFragmentBinding = BaseFragmentBinding.inflate(inflater, container, false)
+        return baseFragmentBinding?.root
+        //return inflater.inflate(R.layout.base_fragment, container, false) <<- Delete it
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        baseFragmentBinding = null
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view_edit_button.setOnClickListener {
+        baseFragmentBinding?.viewEditButton?.setOnClickListener {
 
-            ViewModelProvider(requireActivity(), ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application))
-                .get(DataViewModel::class.java).let {model ->
+            ViewModelProvider(requireActivity(), ViewModelProvider.AndroidViewModelFactory
+                .getInstance(requireActivity().application))[DataViewModel::class.java].let { model ->
                     val supportFragmentManager = requireActivity().supportFragmentManager
 
                     model.filepath.observe(this, Observer {
@@ -49,14 +56,12 @@ class BaseFragment : Fragment() {
                             .addToBackStack("ViewEditBaseFragment").commit()
                     })
                 }
-            (activity as MainActivity).let {
-                it.sendFileActionIntentOpenDocument()
-            }
+            (activity as MainActivity).sendFileActionIntentOpenDocument()
         }
-        new_file_button.setOnClickListener {
+        baseFragmentBinding?.newFileButton?.setOnClickListener {
             Toast.makeText(requireContext(), "Not Implemented", Toast.LENGTH_SHORT).show()
         }
-        change_password.setOnClickListener {
+        baseFragmentBinding?.changePassword?.setOnClickListener {
             Toast.makeText(requireContext(), "Not Implemented", Toast.LENGTH_SHORT).show()
         }
     }

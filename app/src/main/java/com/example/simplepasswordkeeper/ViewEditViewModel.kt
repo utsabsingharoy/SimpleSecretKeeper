@@ -20,7 +20,7 @@ class ViewEditViewModel : ViewModel() {
 
     fun saveModification(currentSelection:String, data : List<SchemaType>) {
         persistentStorage.run {
-            decryptedData.modifyEntrie(currentSelection, data)
+            decryptedData.modifyEntry(currentSelection, data)
             writeToPersistentStorage()
         }
     }

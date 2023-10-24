@@ -8,7 +8,7 @@ import androidx.fragment.app.FragmentActivity
 class BiometricUnlock {
     companion object {
         fun setBiometricUnlock(activity : FragmentActivity, successCallback : ()->Unit) {
-            if (BiometricManager.from(activity).canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS) {
+            if (BiometricManager.from(activity).canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_WEAK) == BiometricManager.BIOMETRIC_SUCCESS) {
                 activity.applicationContext.let { applicationContext ->
                     BiometricPrompt(activity, activity.mainExecutor,
                         object : BiometricPrompt.AuthenticationCallback() {
